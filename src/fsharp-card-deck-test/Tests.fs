@@ -3,6 +3,7 @@ module Tests
 open System
 open Xunit
 open CardDeck
+open System.Collections.Generic
 
 [<Fact>]
 let ``Full deck is 52 unique cards`` () =
@@ -28,3 +29,26 @@ let ``Shuffle changes order of deck`` () =
     else
         Assert.NotEqual (firstCard, shuffledFirstCard)
 
+[<Fact>]
+let ``Draw 1 card retrieves one card and leaves 51`` () =
+    let deck = fullDeck()
+    let expected = deck |> List.take 1
+
+    let cards, newDeck = draw 1 deck
+
+    let length = newDeck |> List.length
+    Assert.Equal<IEnumerable<Card>>(expected, cards)
+    Assert.Equal(51, length)
+
+[<Fact>]
+let ``Draw 3 cards retrieves three card`` () =
+    let deck = fullDeck()
+    let expected = deck |> List.take 3
+
+    let cards, newDeck = draw 3 deck
+
+    let length = newDeck |> List.length
+    let expectedSeq = expected |> List.toSeq
+    let cardsSeq = cards |> List.toSeq
+    Assert.Equal<IEnumerable<Card>>(expected, cards)
+    Assert.Equal(48, length)
