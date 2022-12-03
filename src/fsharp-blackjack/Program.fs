@@ -1,6 +1,7 @@
 ﻿open CardDeck
 
-module Entry =
+module Entry = 
+    printfn "Hello world"
 
     // set players
     // play game

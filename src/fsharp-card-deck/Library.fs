@@ -1,6 +1,8 @@
 ﻿
 module CardDeck
 
+    open System
+
     type Suit =
         | Spades
         | Clubs
@@ -39,11 +41,12 @@ module CardDeck
         ]
 
     let shuffle inDeck : Deck =
-        inDeck 
-        |> List.map(fun(card) -> (card, 3))
-        |> List.sortBy(fun(t) -> 
-                match t with (_, rnd) -> rnd )
-        |> List.map(fun(t) -> match t with (card, _) -> card)
+        let randomGenerator = Random()
+        let _, cards = inDeck 
+                        |> List.zip(List.init (List.length inDeck) (fun _ -> randomGenerator.Next()))
+                        |> List.sortBy (fun (random, _) -> random)
+                        |> List.unzip 
+        cards
 
     let draw numberOfCards deck =
         if List.length deck < numberOfCards then 
