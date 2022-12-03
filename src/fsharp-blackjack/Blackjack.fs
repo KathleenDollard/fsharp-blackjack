@@ -77,7 +77,7 @@ module Blackjack
 
     let gameSetup players =
         let deck = fullDeck () |> shuffle
-        let deck, hands = deal 2 deck (List.length players)
+        let hands, deck = deal 2 (List.length players) deck
         let zipped = players |> List.zip hands
         let players = zipped |> List.map (fun(hand, player) -> { player with Hand = hand})
         deck, players

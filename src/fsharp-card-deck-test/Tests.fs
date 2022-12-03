@@ -48,7 +48,21 @@ let ``Draw 3 cards retrieves three card`` () =
     let cards, newDeck = draw 3 deck
 
     let length = newDeck |> List.length
-    let expectedSeq = expected |> List.toSeq
-    let cardsSeq = cards |> List.toSeq
     Assert.Equal<IEnumerable<Card>>(expected, cards)
-    Assert.Equal(48, length)
+    Assert.Equal(49, length)
+
+[<Fact>]
+let ``Deal 2 cards to 3 hands`` () =
+    let deck = fullDeck()
+    let numberOfHands = 3
+    let numberOfCards = 2
+
+    let hands, newDeck = deal numberOfCards numberOfHands deck
+
+    let length = newDeck |> List.length
+    Assert.Equal(46, length)
+
+    for i in [0..numberOfCards - 1] do
+        for j in [0..numberOfHands - 1] do
+            let pos = j + (numberOfHands * i)
+            Assert.Equal(deck[pos], hands[j][i])

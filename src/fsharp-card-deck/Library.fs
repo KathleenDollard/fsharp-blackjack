@@ -57,7 +57,7 @@ module CardDeck
     //let drawOne = draw 1
 
     // Dealing implies each player gets one card
-    let deal numberOfCards deck numberOfPlayers =
+    let deal numberOfCards numberOfPlayers deck  =
         let countCardsToDeal = numberOfCards * numberOfPlayers
         if (List.length deck) < countCardsToDeal then 
            failwith "Not enough cards in deck"
@@ -67,7 +67,7 @@ module CardDeck
         let groups = indexed |> List.groupBy (fun (pos, _) -> pos % numberOfPlayers)
         let hands = groups |> List.map (fun (a, t) -> t |> List.map (fun (a, card) -> card))
 
-        remainingCards, hands
+        hands, remainingCards
 
 
 
