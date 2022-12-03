@@ -1,6 +1,8 @@
 ﻿
 module CardDeck
 
+    open System
+
     type Suit =
         | Spades
         | Clubs
@@ -39,11 +41,12 @@ module CardDeck
         ]
 
     let shuffle inDeck : Deck =
-        inDeck 
-        |> List.map(fun(card) -> (card, 3))
-        |> List.sortBy(fun(t) -> 
-                match t with (_, rnd) -> rnd )
-        |> List.map(fun(t) -> match t with (card, _) -> card)
+        let randomGenerator = Random()
+        let _, cards = inDeck 
+                        |> List.zip(List.init (List.length inDeck) (fun _ -> randomGenerator.Next()))
+                        |> List.sortBy (fun (random, _) -> random)
+                        |> List.unzip 
+        cards
 
     let draw numberOfCards deck =
         if List.length deck < numberOfCards then 
@@ -54,7 +57,7 @@ module CardDeck
     //let drawOne = draw 1
 
     // Dealing implies each player gets one card
-    let deal numberOfCards deck numberOfPlayers =
+    let deal numberOfCards numberOfPlayers deck  =
         let countCardsToDeal = numberOfCards * numberOfPlayers
         if (List.length deck) < countCardsToDeal then 
            failwith "Not enough cards in deck"
@@ -64,7 +67,7 @@ module CardDeck
         let groups = indexed |> List.groupBy (fun (pos, _) -> pos % numberOfPlayers)
         let hands = groups |> List.map (fun (a, t) -> t |> List.map (fun (a, card) -> card))
 
-        remainingCards, hands
+        hands, remainingCards
 
 
 
