@@ -71,7 +71,7 @@ module Blackjack
     let defaultPlayer = { Name = "?"
                           Hand = []
                           LastAction = Start
-                          IsDealer = true
+                          IsDealer = false
                           Strategy = defensivePlayer }
 
     let standAt target hand =
@@ -126,38 +126,55 @@ module Blackjack
         ]
         deck, newPlayers
 
-    let gameSetup players =
-        let deck = fullDeck () |> shuffle
-        let hands, deck = deal 2 (List.length players) deck
-        let zipped = players |> List.zip hands
-        let players = zipped |> List.map (fun(hand, player) -> { player with Hand = hand})
-        deck, players
-
-    let reportOutcome dealerScore winners losers =
-        if List.length winners = 0 then 
-             printfn $"Dealer wins with a score of {dealerScore}"
-        else
-             printfn $"Dealer score is {dealerScore}"
-             for player in winners do
-                 printfn $"Player {player.Name} wins with a score of {score player.Hand}"
-
-        for player in losers do
-             printfn $"Player {player.Name} loses with a score of {score player.Hand}"
-
-    let dealer =
+    let defaultDealer =
         { Name = "Dealer"
           Hand = []
           LastAction = Start
           IsDealer = true
           Strategy = dealerStrategy }
 
+    let gameSetup players =
+        let playerCount = players |> List.length
+        let players = players |> List.insertAt playerCount defaultDealer
+            
+        let deck = fullDeck () |> shuffle
+        // Note that playerCount is no longer valid here
+        let hands, deck = deal 2 (List.length players) deck
+        let playersWithHands = 
+            players 
+            |> List.zip hands
+            |> List.map (fun(hand, player) -> { player with Hand = hand})
+        deck, playersWithHands
+
+    // Note table specific rules that dealer always wins any tie, except a player 
+    // blackjack against a dealer multi-card 21
+    let isWinner dealerScore (_, handScore) =  // player and parameter order support currying/partial application
+        match dealerScore, handScore with
+        | _, Bust
+        | Blackjack, _ -> false
+        | _, Blackjack     // Blackjack tie previousy handled
+        | Bust, _ -> true  // Bust tie previousy handled
+        | ValueScore dealerScore, ValueScore handScore 
+            when handScore > dealerScore -> true
+        | _ -> false
+
+    let gameResults players =
+        let dealer = players |> List.where (fun(player) -> player.IsDealer)
+                             |> List.head
+        let dealerScore = score dealer.Hand
+        let nonDealersWithScores = 
+            players |> List.where (fun player -> not player.IsDealer)
+                    |> List.map (fun player -> player, score player.Hand)
+
+        let winAgainstDealer = isWinner dealerScore
+        let allWinners, losers = 
+            nonDealersWithScores |> List.partition winAgainstDealer
+        let blackjackWinners, winners = 
+            allWinners |> List.partition (fun (_, score) -> score = Blackjack)
+        dealerScore, blackjackWinners, winners, losers
+
+
     let playGame players =
-        let players = players |> List.insertAt 0 dealer
         let deck, players = gameSetup players
         let _, players = play deck players
-
-        let dealerScore = score dealer.Hand
-        let nonDealers = players |> List.filter (fun player -> not player.IsDealer)
-        let winners, losers = nonDealers |> List.partition (fun player -> score player.Hand > dealerScore)
-        
-        reportOutcome dealerScore winners losers
+        gameResults players
