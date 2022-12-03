@@ -10,11 +10,11 @@ module Blackjack
           IsDealer : bool }
 
     and Action =
-        | None
+        | Start
         | Hit
         | Stand
 
-    and Strategy = Player -> Action
+    and Strategy = Hand -> Action
 
     type Score =
         | Bust
@@ -64,18 +64,18 @@ module Blackjack
         let player = { player with Hand = player.Hand |> List.append cards }
         deck, player
 
-    let aggressivePlayer: Strategy = fun player -> Hit
+    let aggressivePlayer: Strategy = fun _ -> Hit
 
-    let defensivePlayer: Strategy = fun player -> Stand
+    let defensivePlayer: Strategy = fun _ -> Stand
 
     let defaultPlayer = { Name = "?"
                           Hand = []
-                          LastAction = None
+                          LastAction = Start
                           IsDealer = true
                           Strategy = defensivePlayer }
 
-    let standAt (target: int) (player: Player) =
-        match score player.Hand with
+    let standAt target hand =
+        match score hand with
         | Blackjack
         | Bust -> Stand
         | ValueScore score ->
@@ -88,17 +88,29 @@ module Blackjack
     let dealerStrategy: Strategy =
         standAt 17
 
-    let playerTurn deck player  =
-        // @Chet: I find the following line a bit odd. Seems a smell
-        let mutable currentAction = None
+    let rec playerTurn deck player  =
+        let action = player.Strategy player.Hand
+
+        match action with 
+        | Hit -> 
+            let newDeck, newPlayer = hit deck player
+            playerTurn newDeck newPlayer
+        | Start
+        | Stand -> deck, player
+
+    // leaving for now to compare to recursion
+    let playerTurn2 deck player  =
+        let mutable currentAction = Start
         let mutable player = player
         let mutable deck = deck
         while currentAction <> Stand do
-            currentAction <- player.Strategy player
+            // @Chet: I find the following line a bit odd. Seems a smell to pass a 
+            // player hand to a property of the player
+            currentAction <- player.Strategy player.Hand
             let newDeck, newPlayer =
                 match currentAction with 
                 | Hit -> hit deck player
-                | None
+                | Start
                 | Stand -> (deck, player)
             player <- newPlayer
             deck <- newDeck
@@ -135,7 +147,7 @@ module Blackjack
     let dealer =
         { Name = "Dealer"
           Hand = []
-          LastAction = None
+          LastAction = Start
           IsDealer = true
           Strategy = dealerStrategy }
 
@@ -149,5 +161,3 @@ module Blackjack
         let winners, losers = nonDealers |> List.partition (fun player -> score player.Hand > dealerScore)
         
         reportOutcome dealerScore winners losers
- 
-        None

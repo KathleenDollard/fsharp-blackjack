@@ -25,6 +25,7 @@ module CardDeck
             | Ace suit -> $"Ace of ${suit}"
 
     type Deck = Card list
+    type Hand = Card list
 
     let fullDeck() =
         let suits = [ Spades; Clubs; Diamonds; Hearts ]
