@@ -16,6 +16,11 @@ module Blackjack
 
     and Strategy = Player -> Action
 
+    type Score =
+        | Bust
+        | ValueScore of int
+        | Blackjack
+
     // TODO: Consider DU for bust, blackjack, and score
     let score ({ Hand = cards }) = 
 
@@ -24,13 +29,20 @@ module Blackjack
             | FaceCard (_, _) -> 10
             | ValueCard (_, value) -> value
             | Ace (_) -> if aceOne then 1 else 11
-            
-        let cardScoreAceLow = cardScore true
-        let cardScoreAceHigh = cardScore false
-        let lowScore = cards |> List.sumBy cardScoreAceLow
-        let highScore =   cards |> List.sumBy cardScoreAceHigh
-        let score = if highScore > 21 then lowScore else highScore
-        if score > 21 then 0 else score
+        
+        let handScore cards =
+            let cardScoreAceLow = cardScore true
+            let cardScoreAceHigh = cardScore false
+            let lowScore = cards |> List.sumBy cardScoreAceLow
+            let highScore =   cards |> List.sumBy cardScoreAceHigh
+            if highScore > 21 then lowScore else highScore
+
+        let score = handScore cards
+
+        if score = 21 then Blackjack
+        else 
+            if score > 21 then Bust
+            else ValueScore score
       
     let hit deck player =
         let cards, deck  = draw 1 deck
@@ -42,10 +54,14 @@ module Blackjack
     let defensivePlayer: Strategy = fun player -> Stand
 
     let standAt (target: int) (player: Player) =
-        if score player >= target then
-            Stand
-        else
-            Hit
+        match score player with
+        | Blackjack
+        | Bust -> Stand
+        | ValueScore score ->
+            if score >= target then
+                Stand
+            else
+                Hit
 
     // The dealer strategy is set by table rules
     let dealerStrategy: Strategy =
