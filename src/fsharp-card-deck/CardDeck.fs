@@ -40,10 +40,6 @@ let fullDeck () =
           for face in faces do
               FaceCard(suit, face) ]
 
-let shuffle inDeck : Deck =
-    inDeck
-    |> List.sortBy (fun c -> Random.Shared.Next())
-
 let draw numberOfCards (deck: Deck) =
     if List.length deck < numberOfCards then
         failwith "Not enough cards in deck"
@@ -52,16 +48,23 @@ let draw numberOfCards (deck: Deck) =
 
 let drawOne = draw 1
 
+let shuffle inDeck : Deck =
+    inDeck
+    |> List.sortBy (fun c -> Random.Shared.Next())
+
 // Dealing implies each player gets one card
 let deal numberOfCards numberOfPlayers deck =
     let countCardsToDeal = numberOfCards * numberOfPlayers
 
     if (List.length deck) < countCardsToDeal then
         failwith "Not enough cards in deck"
-
     let cardsToDeal, remainingCards = deck |> List.splitAt countCardsToDeal
-    let indexed = cardsToDeal |> List.indexed
+
+    let indexed = cardsToDeal |> List.indexed // creates a tupled list with index/member
     let groups = indexed |> List.groupBy (fun (pos, _) -> pos % numberOfPlayers)
-    let hands = groups |> List.map (fun (a, t) -> t |> List.map (fun (a, card) -> card))
+    let hands = 
+        groups 
+        |> List.map (fun (_, t) -> 
+           t |> List.map (fun (_, card) -> card))
 
     hands, remainingCards
