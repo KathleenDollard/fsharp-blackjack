@@ -5,14 +5,12 @@
     <RootNamespace>fsharp_blackjack_test</RootNamespace>
 
     <IsPackable>false</IsPackable>
-    <GenerateProgramFile>false</GenerateProgramFile>
   </PropertyGroup>
 
   <ItemGroup>
     <Compile Include="ScoringTests.fs" />
     <Compile Include="StrategyTests.fs" />
     <Compile Include="GameTests.fs" />
-    <Compile Include="Program.fs" />
   </ItemGroup>
 
   <ItemGroup>

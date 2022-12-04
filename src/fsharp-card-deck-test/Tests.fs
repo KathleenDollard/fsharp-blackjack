@@ -12,7 +12,6 @@ let ``Full deck is 52 unique cards`` () =
     Assert.Equal(52, length)
     Assert.Distinct(deck)
 
-
 [<Fact>]
 let ``Shuffle changes order of deck`` () =
     let deck = fullDeck ()

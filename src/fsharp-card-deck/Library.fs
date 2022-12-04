@@ -41,24 +41,16 @@ let fullDeck () =
               FaceCard(suit, face) ]
 
 let shuffle inDeck : Deck =
-    let randomGenerator = Random()
+    inDeck
+    |> List.sortBy (fun c -> Random.Shared.Next())
 
-    let _, cards =
-        inDeck
-        |> List.zip (List.init (List.length inDeck) (fun _ -> randomGenerator.Next()))
-        |> List.sortBy (fun (random, _) -> random)
-        |> List.unzip
-
-    cards
-
-let draw numberOfCards deck =
+let draw numberOfCards (deck: Deck) =
     if List.length deck < numberOfCards then
         failwith "Not enough cards in deck"
 
     deck |> List.splitAt numberOfCards
 
-// @Chet Why isn't the following simple partial application
-//let drawOne = draw 1
+let drawOne = draw 1
 
 // Dealing implies each player gets one card
 let deal numberOfCards numberOfPlayers deck =
