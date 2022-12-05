@@ -11,6 +11,8 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Compile Include="Basics.fs" />
+    <Compile Include="Strategy.fs" />
     <Compile Include="Blackjack.fs" />
     <Compile Include="Program.fs" />
   </ItemGroup>

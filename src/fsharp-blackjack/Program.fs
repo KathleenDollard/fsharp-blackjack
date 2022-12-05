@@ -1,5 +1,6 @@
 ﻿open CardDeck
 open Blackjack
+open Basics
 
 module Entry =
 
