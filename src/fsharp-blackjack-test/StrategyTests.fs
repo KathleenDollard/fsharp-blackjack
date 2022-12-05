@@ -3,13 +3,16 @@ module StrategyTests
 open Xunit
 open CardDeck
 open Blackjack
+open Basics
+open Strategy
 open System.Collections.Generic
 
 [<Fact>]
 let ``Hit for standAt when hand score is below target`` () =
     let hand = [ ValueCard(Hearts, 6); FaceCard(Spades, King) ]
 
-    let action = standAt 17 hand
+    let score = score hand
+    let action = standAt 17 score
 
     Assert.Equal(Hit, action)
 
@@ -17,7 +20,8 @@ let ``Hit for standAt when hand score is below target`` () =
 let ``Stand for standAt when hand score is at target`` () =
     let hand = [ ValueCard(Hearts, 6); FaceCard(Spades, King) ]
 
-    let action = standAt 16 hand
+    let score = score hand
+    let action = standAt 16 score
 
     Assert.Equal(Stand, action)
 
@@ -25,7 +29,8 @@ let ``Stand for standAt when hand score is at target`` () =
 let ``Stand for standAt when hand score is above target`` () =
     let hand = [ ValueCard(Hearts, 8); FaceCard(Spades, King) ]
 
-    let action = standAt 17 hand
+    let score = score hand
+    let action = standAt 17 score
 
     Assert.Equal(Stand, action)
 
@@ -33,7 +38,8 @@ let ``Stand for standAt when hand score is above target`` () =
 let ``Stand for standAt when hand score is blackjack`` () =
     let hand = [ Ace(Hearts); FaceCard(Spades, King) ]
 
-    let action = standAt 17 hand
+    let score = score hand
+    let action = standAt 17 score
 
     Assert.Equal(Stand, action)
 
@@ -41,6 +47,7 @@ let ``Stand for standAt when hand score is blackjack`` () =
 let ``Stand for standAt when hand score is bust`` () =
     let hand = [ ValueCard(Hearts, 6); ValueCard(Hearts, 6); FaceCard(Spades, King) ]
 
-    let action = standAt 16 hand
+    let score = score hand
+    let action = standAt 16 score
 
     Assert.Equal(Stand, action)

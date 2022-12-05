@@ -3,6 +3,8 @@ module GameTests
 open Xunit
 open CardDeck
 open Blackjack
+open Basics
+open Strategy
 open System.Collections.Generic
 
 [<Fact>]
@@ -19,7 +21,7 @@ let ``Player turn with unshuffled deck takes 4 cards to total 20`` () =
     Assert.Equal<IEnumerable<Card>>((expectedHand |> List.take 2), hand) // prelim sanity check
 
     let player =
-        { defaultPlayer with
+        { Player.Default with
             Hand = hand
             Strategy = standAt 17 }
 
@@ -34,7 +36,7 @@ let ``Player turn with unshuffled deck takes 4 cards to total 20`` () =
 let ``Player turn with a shuffled deck has no crashes or hangs`` () =
 
     let mutable deck = fullDeck () |> shuffle
-    let basePlayer = { defaultPlayer with Strategy = standAt 17 }
+    let basePlayer = { Player.Default with Strategy = standAt 17 }
 
     while (deck |> List.length) > 10 do // this should avoid end of deck errors
         let hands, deckAfterDeal = deal 2 1 deck
@@ -48,7 +50,7 @@ let ``Player turn with a shuffled deck has no crashes or hangs`` () =
 [<Fact>]
 let ``Game setup includes dealer ??with stand at 17 strategy??`` () =
     let expectedPlayersLength = 4
-    let explicitPlayers = [ defaultPlayer; defaultPlayer; defaultPlayer ]
+    let explicitPlayers = [ Player.Default; Player.Default; Player.Default ]
 
     let _, players = gameSetup explicitPlayers
 
@@ -64,7 +66,7 @@ let ``Game setup includes dealer ??with stand at 17 strategy??`` () =
 [<Fact>]
 let ``Game setup results in players with hands that have been shuffled`` () =
     let expectedDeckCount = 44
-    let players = [ defaultPlayer; defaultPlayer; defaultPlayer ]
+    let players = [ Player.Default; Player.Default; Player.Default ]
 
     let deck, players = gameSetup players
 
@@ -77,22 +79,22 @@ let ``Game setup results in players with hands that have been shuffled`` () =
         Assert.NotEqual(Ace(Spades), players[0].Hand[0]) // For clarity, always true
 
 let player1 =
-    { defaultPlayer with
+    { Player.Default with
         Name = "One"
         Hand = [ ValueCard(Spades, 8); ValueCard(Hearts, 7); ValueCard(Clubs, 6) ] }
 
 let player2 =
-    { defaultPlayer with
+    { Player.Default with
         Name = "Two"
         Hand = [ ValueCard(Spades, 8); ValueCard(Hearts, 8); ValueCard(Clubs, 6) ] }
 
 let player3 =
-    { defaultPlayer with
+    { Player.Default with
         Name = "Three"
         Hand = [ Ace(Clubs); FaceCard(Clubs, Queen) ] }
 
 let player4 =
-    { defaultPlayer with
+    { Player.Default with
         Name = "Four"
         Hand = [ ValueCard(Spades, 8); ValueCard(Hearts, 6); ValueCard(Clubs, 6) ] }
 
@@ -102,7 +104,7 @@ let playerScoreName (player, score) = player.Name
 
 [<Fact>]
 let ``Dealer blackjack wins against all`` () =
-    let dealer = { defaultDealer with Hand = [ Ace(Spades); FaceCard(Hearts, Queen) ] }
+    let dealer = { Player.Dealer with Hand = [ Ace(Spades); FaceCard(Hearts, Queen) ] }
 
     let players = startingPlayers |> List.append [ dealer ]
 
@@ -117,7 +119,7 @@ let ``Dealer blackjack wins against all`` () =
 [<Fact>]
 let ``Only player blackjack wins against dealer 21`` () =
     let dealer =
-        { defaultDealer with Hand = [ ValueCard(Spades, 6); ValueCard(Spades, 5); FaceCard(Hearts, Queen) ] }
+        { Player.Dealer with Hand = [ ValueCard(Spades, 6); ValueCard(Spades, 5); FaceCard(Hearts, Queen) ] }
 
     let players = startingPlayers |> List.append [ dealer ]
 
@@ -131,7 +133,7 @@ let ``Only player blackjack wins against dealer 21`` () =
 [<Fact>]
 let ``All but bust win against dealer 17`` () =
     let dealer =
-        { defaultDealer with Hand = [ ValueCard(Spades, 3); ValueCard(Spades, 4); FaceCard(Hearts, Queen) ] }
+        { Player.Dealer with Hand = [ ValueCard(Spades, 3); ValueCard(Spades, 4); FaceCard(Hearts, Queen) ] }
 
     let players = startingPlayers |> List.append [ dealer ]
 

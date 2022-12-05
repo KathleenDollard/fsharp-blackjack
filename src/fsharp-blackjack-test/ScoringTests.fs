@@ -3,6 +3,7 @@ module ScoringTests
 open Xunit
 open CardDeck
 open Blackjack
+open Basics
 open System.Collections.Generic
 
 [<Fact>]
