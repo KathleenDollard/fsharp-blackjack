@@ -34,7 +34,7 @@ let ``Draw 1 card retrieves one card and leaves 51`` () =
     let deck = fullDeck ()
     let expected = deck |> Array.take 1
 
-    let cards, newDeck = draw 1 deck
+    let cards, newDeck = drawOne deck
 
     let length = newDeck |> Array.length
     Assert.Equal<IEnumerable<Card>>(expected, cards)

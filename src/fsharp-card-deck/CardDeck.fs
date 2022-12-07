@@ -56,7 +56,6 @@ let deal numberOfCards numberOfPlayers deck =
     // check preconditions first before doing any more work
     let countCardsToDeal = numberOfCards * numberOfPlayers
 
-    // Split deck to cards to deal and remaining cards
     if (Array.length deck) < countCardsToDeal then
         failwith "Not enough cards in deck"
 
@@ -69,7 +68,8 @@ let deal numberOfCards numberOfPlayers deck =
         roundOfCards
         |> Array.iteri (fun playerIndex card ->
             playerHands[playerIndex][roundNumber] <- card)
-
+    
+    // Split deck to cards to deal and remaining cards
     let cardsToDeal, remainingCards = deck |> Array.splitAt countCardsToDeal
 
     cardsToDeal
@@ -77,19 +77,3 @@ let deal numberOfCards numberOfPlayers deck =
     |> Array.iteri dealRoundToPlayers
 
     playerHands, remainingCards
-
-let dealOld numberOfCards numberOfPlayers deck =
-    let countCardsToDeal = numberOfCards * numberOfPlayers
-
-    // Split deck to cards to deal and remaining cards
-    if (List.length deck) < countCardsToDeal then
-        failwith "Not enough cards in deck"
-
-    let cardsToDeal, remainingCards = deck |> List.splitAt countCardsToDeal
-
-    // Add an index, group, remove indexes
-    let indexed = cardsToDeal |> List.indexed // creates a tupled list with index/member
-    let groups = indexed |> List.groupBy (fun (pos, _) -> pos % numberOfPlayers)
-    let hands = groups |> List.map (fun (_, t) -> t |> List.map (fun (_, card) -> card))
-
-    hands, remainingCards
