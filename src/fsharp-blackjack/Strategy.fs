@@ -1,6 +1,6 @@
 ﻿module Strategy
 
-open Basics
+open Domain
 
 type Strategy = Score -> Action
 
@@ -15,4 +15,4 @@ let standAt target score =
     | ValueScore score -> if score >= target then Stand else Hit
 
 // The dealer strategy is set by table rules
-let dealerStrategy : Strategy = standAt 17
+let dealerStrategy: Strategy = standAt 17

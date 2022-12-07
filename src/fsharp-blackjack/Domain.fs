@@ -1,4 +1,4 @@
-﻿module Basics
+﻿module Domain
 
 open CardDeck
 
@@ -29,19 +29,19 @@ let handValue hand =
         let high = if aceCount = 0 then 0 else 10 + aceCount // this is 11 + (aceCount - 1) reduced
         low, high
 
-    let aces, nonAces = hand |> List.partition isAnAce
+    let aces, nonAces = hand |> Array.partition isAnAce
 
-    let handScoreNoAce = nonAces |> List.sumBy cardScore
-    let aceScoreLow, aceScoreHigh = aceScores (aces |> List.length)
+    let handScoreNoAce = nonAces |> Array.sumBy cardScore
+    let aceScoreLow, aceScoreHigh = aceScores (aces |> Array.length)
 
     if (handScoreNoAce + aceScoreHigh) <= 21 then
         handScoreNoAce + aceScoreHigh
     else
         handScoreNoAce + aceScoreLow
-     
+
 let score (hand) =
     let value = handValue hand
-    let cardCount = hand |> List.length
+    let cardCount = hand |> Array.length
 
     if value = 21 && cardCount = 2 then Blackjack
     else if value > 21 then Bust

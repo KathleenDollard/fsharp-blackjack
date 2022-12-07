@@ -1,6 +1,6 @@
 ﻿open CardDeck
 open Blackjack
-open Basics
+open Domain
 
 module Entry =
 
