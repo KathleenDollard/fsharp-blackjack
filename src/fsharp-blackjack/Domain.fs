@@ -55,5 +55,4 @@ let isWinner dealerScore (_, handScore) = // player and parameter order support 
     | Blackjack, _ -> false
     | _, Blackjack // Blackjack tie previousy handled
     | Bust, _ -> true // Bust tie previousy handled
-    | ValueScore dealerScore, ValueScore handScore when handScore > dealerScore -> true
-    | _ -> false
+    | ValueScore dealerScore, ValueScore handScore -> handScore > dealerScore 
