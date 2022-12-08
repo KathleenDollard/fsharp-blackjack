@@ -59,7 +59,7 @@ let playerTurn2 deck player =
 
     deck, player
 
-let play deck players =
+let play deck (players: Player array) =
     let mutable deck = deck
 
     let newPlayers =
@@ -88,23 +88,22 @@ let gameSetup players =
 let gameResults players =
     let dealer =
         players
-        |> Array.pick (fun (player) -> if player.IsDealer then Some player else None)
+        |> Array.find (fun (player) -> player.IsDealer)
 
     let dealerScore = score dealer.Hand
 
     let nonDealersWithScores =
         players
-        |> Array.choose (fun player ->
-            if not player.IsDealer then
-                Some(player, score player.Hand)
-            else
-                None)
+        |> Array.where (fun player -> not player.IsDealer)
+        |> Array.map (fun player -> player, score player.Hand)
 
-    let winAgainstDealer = isWinner dealerScore
-    let allWinners, losers = nonDealersWithScores |> Array.partition winAgainstDealer
+    let allWinners, losers = 
+        nonDealersWithScores 
+        |> Array.partition (isWinner dealerScore)
 
     let blackjackWinners, winners =
-        allWinners |> Array.partition (fun (_, score) -> score = Blackjack)
+        allWinners 
+        |> Array.partition (fun (_, score) -> score = Blackjack)
 
     dealerScore, blackjackWinners, winners, losers
 
